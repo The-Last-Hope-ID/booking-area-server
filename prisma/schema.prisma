@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum CourtStatus {
+  AVAILABLE
+  BOOKED
+  USED
+}
+
+enum BookingStatus {
+  PENDING
+  CANCELED
+  COMPLETED
+}
+
+model User {
+  id Int @id @default(autoincrement()) 
+  name String
+  username String @unique
+  email String @unique
+  password String @unique
+  profile_img String?
+  is_admin Boolean @default(false)
+  role_id Int?
+  created_at DateTime @db.DateTime(0) @default(now())
+  updated_at DateTime @db.DateTime(0) @updatedAt
+
+  role Role? @relation(fields: [role_id], references: [id])
+  bookings Booking[] @relation(name: "UserBookings")
+  bookings_admin Booking[] @relation(name: "AdminBookings")
+  settings_updated Setting? @relation(name: "updated_by_user")
+
+  @@map("users")
+}
+
+model Court {
+  id Int @id @default(autoincrement())
+  name String @unique
+  description String @db.Text
+  image String 
+  status CourtStatus @default(AVAILABLE)
+  price BigInt @db.BigInt @default(0)
+  down_payment BigInt? @db.BigInt @default(0)
+  time_expire_booking Int?
+  time_expire_canceled Int?
+  created_at DateTime @db.DateTime(0) @default(now())
+  updated_at DateTime @db.DateTime(0) @updatedAt
+
+  bookings Booking[]
+
+  @@map("courts")
+}
+
+model Booking {
+  id Int @id @default(autoincrement())
+  user_id Int
+  court_id Int
+  admin_id Int
+  booking_date DateTime @db.DateTime(0)
+  booking_expire DateTime @db.DateTime(0)
+  payment_type String 
+  status BookingStatus @default(PENDING)
+  down_payment BigInt @db.BigInt @default(0)
+  total_price BigInt @db.BigInt @default(0)
+  created_at DateTime @db.DateTime(0) @default(now())
+  updated_at DateTime @db.DateTime(0) @updatedAt
+
+  user User @relation(name: "UserBookings", fields: [user_id], references: [id])
+  court Court @relation(fields: [court_id], references: [id])
+  admin User @relation(name: "AdminBookings", fields: [admin_id], references: [id]) 
+
+  @@map("bookings")
+}
+
+model Setting {
+  id Int @id @default(autoincrement())
+  company_name String
+  company_description String @db.Text 
+  company_logo String
+  company_address String 
+  is_global_price Boolean @default(false)
+  down_payment BigInt @db.BigInt @default(0)
+  global_price BigInt @db.BigInt @default(0)
+  is_global_time_expire Boolean @default(false)
+  global_time_expire Int @default(0)
+  global_time_canceled Int @default(0)
+  created_at DateTime @db.DateTime(0) @default(now())
+  updated_at DateTime @db.DateTime(0) @updatedAt
+  updated_by Int? @unique
+
+  updated_by_user User? @relation(name: "updated_by_user", fields: [updated_by], references: [id])
+
+  @@map("settings")
+}
+
+model Role {
+  id Int @id @default(autoincrement())
+  name String @unique
+  created_at DateTime @db.DateTime(0) @default(now())
+  updated_at DateTime @db.DateTime(0) @updatedAt
+
+  permissions RolePermission[]
+  users User[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id Int @id @default(autoincrement())
+  name String @unique
+  created_at DateTime @db.DateTime(0) @default(now())
+  updated_at DateTime @db.DateTime(0) @updatedAt
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id Int @id @default(autoincrement())
+  role_id Int
+  permission_id Int
+  created_at DateTime @db.DateTime(0) @default(now())
+  updated_at DateTime @db.DateTime(0) @updatedAt
+
+  role Role @relation(fields: [role_id], references: [id])
+  permission Permission @relation(fields: [permission_id], references: [id])
+
+  @@map("role_permissions")
+}
