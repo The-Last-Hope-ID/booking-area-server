@@ -30,8 +30,9 @@ model User {
   name String
   username String @unique
   email String @unique
-  password String @unique
+  password String
   profile_img String?
+  phone String @unique
   is_admin Boolean @default(false)
   role_id Int?
   created_at DateTime @db.DateTime(0) @default(now())
@@ -70,6 +71,7 @@ model Booking {
   admin_id Int
   booking_date DateTime @db.DateTime(0)
   booking_expire DateTime @db.DateTime(0)
+  duration Int
   payment_type String 
   status BookingStatus @default(PENDING)
   down_payment BigInt @db.BigInt @default(0)
@@ -96,6 +98,8 @@ model Setting {
   is_global_time_expire Boolean @default(false)
   global_time_expire Int @default(0)
   global_time_canceled Int @default(0)
+  booking_start DateTime @db.DateTime(0)
+  booking_end DateTime @db.DateTime(0)
   created_at DateTime @db.DateTime(0) @default(now())
   updated_at DateTime @db.DateTime(0) @updatedAt
   updated_by Int? @unique
