@@ -28,9 +28,12 @@ model User {
   name String
   username String @unique
   email String @unique
+  emailVerified Boolean @default(false) @map("email_verified")
   password String
   profileImg String? @map("profile_img")
-  phone String @unique @db.VarChar(15)
+  phone String? @unique @db.VarChar(15)
+  accessToken String? @db.VarChar(255) @map("access_token")
+  refreshToken String? @db.VarChar(255) @map("refresh_token")
   isAdmin Boolean @default(false) @map("is_admin")
   roleId Int? @map("role_id")
   createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")

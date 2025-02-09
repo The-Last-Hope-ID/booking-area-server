@@ -1,9 +1,14 @@
 import "module-alias/register"
+import "dotenv/config"
 import express from "express"
 import { promises as fs } from "fs"
 import path from "path"
+import passport from "passport"
+
+import authModule from "@/app/auth/routes/auth.route"
 
 const app = express()
+const PORT = process.env.APP_PORT || 3000
 
 const modulesDir = path.join(__dirname, "app")
 
@@ -23,6 +28,16 @@ const modulesDir = path.join(__dirname, "app")
   }
 })()
 
-app.listen(3000, () => {
-  console.log(`Server is running on http://localhost:3000`)
+app.use(express.json())
+
+app.use(passport.initialize())
+
+app.get("/", (req, res) => {
+  res.send("Hello World")
+})
+
+app.use("/auth", authModule)
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`)
 })
