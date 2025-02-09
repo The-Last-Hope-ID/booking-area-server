@@ -13,16 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum CourtStatus {
-  AVAILABLE
-  BOOKED
-  USED
-}
-
 enum BookingStatus {
   PENDING
-  CANCELED
   COMPLETED
+}
+
+enum CourtSessionStatus {
+  AVAILABLE
+  UNAVAILABLE
 }
 
 model User {
@@ -31,17 +29,17 @@ model User {
   username String @unique
   email String @unique
   password String
-  profile_img String?
-  phone String @unique
-  is_admin Boolean @default(false)
-  role_id Int?
-  created_at DateTime @db.DateTime(0) @default(now())
-  updated_at DateTime @db.DateTime(0) @updatedAt
+  profileImg String? @map("profile_img")
+  phone String @unique @db.VarChar(15)
+  isAdmin Boolean @default(false) @map("is_admin")
+  roleId Int? @map("role_id")
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
-  role Role? @relation(fields: [role_id], references: [id])
+  role Role? @relation(fields: [roleId], references: [id])
   bookings Booking[] @relation(name: "UserBookings")
-  bookings_admin Booking[] @relation(name: "AdminBookings")
-  settings_updated Setting? @relation(name: "updated_by_user")
+  bookingsAdmin Booking[] @relation(name: "AdminBookings")
+  settingsUpdated Setting? @relation(name: "updated_by_user")
 
   @@map("users")
 }
@@ -51,60 +49,89 @@ model Court {
   name String @unique
   description String @db.Text
   image String 
-  status CourtStatus @default(AVAILABLE)
-  price BigInt @db.BigInt @default(0)
-  down_payment BigInt? @db.BigInt @default(0)
-  time_expire_booking Int?
-  time_expire_canceled Int?
-  created_at DateTime @db.DateTime(0) @default(now())
-  updated_at DateTime @db.DateTime(0) @updatedAt
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
-  bookings Booking[]
+  sessions CourtSession[]
+  prices CourtPriceDay[]
 
   @@map("courts")
 }
 
+model CourtSession {
+  id Int @id @default(autoincrement())
+  courtId Int  @map("court_id")
+  startHour Int @map("start_hour")
+  endHour Int @map("end_hour")
+  status CourtSessionStatus @default(AVAILABLE)
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
+
+  court Court @relation(fields: [courtId], references: [id])
+  unavailables CourtSessionUnavailable[]
+  bookings Booking[]
+
+  @@map("court_sessions")
+}
+
+model CourtSessionUnavailable {
+  id Int @id @default(autoincrement())
+  courtSessionId Int @map("court_session_id")
+  date DateTime @db.DateTime(0)
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
+
+  session CourtSession @relation(fields: [courtSessionId], references: [id])
+
+  @@map("court_sessions_unavailable")
+}
+
+model CourtPriceDay {
+  id Int @id @default(autoincrement())
+  courtId Int @map("court_id")
+  dayCode String @db.VarChar(7) @map("day_code") 
+  price Decimal @db.Decimal(10, 0) @default(0)
+  downPayment Decimal @db.Decimal(10, 0) @default(0) @map("down_payment")
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
+
+  court Court @relation(fields: [courtId], references: [id])
+
+  @@map("court_prices_day")
+}
+
 model Booking {
   id Int @id @default(autoincrement())
-  user_id Int
-  court_id Int
-  admin_id Int
-  booking_date DateTime @db.DateTime(0)
-  booking_expire DateTime @db.DateTime(0)
-  duration Int
-  payment_type String 
+  userId Int @map("user_id")
+  adminId Int @map("admin_id")
+  courtSessionId Int @map("court_session_id")
+  bookingDate DateTime @db.DateTime(0) @map("booking_date")
+  paymentId String @map("payment_id")
+  paymentType String @map("payment_type") 
   status BookingStatus @default(PENDING)
-  down_payment BigInt @db.BigInt @default(0)
-  total_price BigInt @db.BigInt @default(0)
-  created_at DateTime @db.DateTime(0) @default(now())
-  updated_at DateTime @db.DateTime(0) @updatedAt
+  downPayment Decimal @db.Decimal(10, 0) @default(0) @map("down_payment")
+  totalPrice Decimal @db.Decimal(10, 0) @default(0) @map("total_price")
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
-  user User @relation(name: "UserBookings", fields: [user_id], references: [id])
-  court Court @relation(fields: [court_id], references: [id])
-  admin User @relation(name: "AdminBookings", fields: [admin_id], references: [id]) 
+  user User @relation(name: "UserBookings", fields: [userId], references: [id])
+  admin User @relation(name: "AdminBookings", fields: [adminId], references: [id]) 
+  session CourtSession @relation(fields: [courtSessionId], references: [id])
 
   @@map("bookings")
 }
 
 model Setting {
   id Int @id @default(autoincrement())
-  company_name String
-  company_description String @db.Text 
-  company_logo String
-  company_address String 
-  is_global_price Boolean @default(false)
-  down_payment BigInt @db.BigInt @default(0)
-  global_price BigInt @db.BigInt @default(0)
-  is_global_time_expire Boolean @default(false)
-  global_time_expire Int @default(0)
-  global_time_canceled Int @default(0)
-  booking_start DateTime @db.DateTime(0)
-  booking_end DateTime @db.DateTime(0)
-  created_at DateTime @db.DateTime(0) @default(now())
-  updated_at DateTime @db.DateTime(0) @updatedAt
-  updated_by Int? @unique
+  companyName String @map("company_name")
+  companyDescription String @db.Text @map("company_description")
+  companyLogo String @map("company_logo")
+  companyAddress String @map("company_address") 
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
+  updatedBy Int? @unique @map("updated_by")
 
-  updated_by_user User? @relation(name: "updated_by_user", fields: [updated_by], references: [id])
+  updatedByUser User? @relation(name: "updated_by_user", fields: [updatedBy], references: [id])
 
   @@map("settings")
 }
@@ -112,8 +139,8 @@ model Setting {
 model Role {
   id Int @id @default(autoincrement())
   name String @unique
-  created_at DateTime @db.DateTime(0) @default(now())
-  updated_at DateTime @db.DateTime(0) @updatedAt
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
   permissions RolePermission[]
   users User[]
@@ -124,8 +151,8 @@ model Role {
 model Permission {
   id Int @id @default(autoincrement())
   name String @unique
-  created_at DateTime @db.DateTime(0) @default(now())
-  updated_at DateTime @db.DateTime(0) @updatedAt
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
   roles RolePermission[]
 
@@ -134,13 +161,13 @@ model Permission {
 
 model RolePermission {
   id Int @id @default(autoincrement())
-  role_id Int
-  permission_id Int
-  created_at DateTime @db.DateTime(0) @default(now())
-  updated_at DateTime @db.DateTime(0) @updatedAt
+  roleId Int @map("role_id")
+  permissionId Int @map("permission_id")
+  createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
+  updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
-  role Role @relation(fields: [role_id], references: [id])
-  permission Permission @relation(fields: [permission_id], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
 
   @@map("role_permissions")
 }
