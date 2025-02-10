@@ -1,9 +1,20 @@
-import bcrypt from "bcrypt"
+export class ResponseError extends Error {
+  status: number
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
 
-export const generateHashedPassword = (password: string) => {
-  const saltRounds = 10
-  const salt = bcrypt.genSaltSync(saltRounds)
-  const hashedPassword = bcrypt.hashSync(password, salt)
+export const validate = (schema: any, request: any) => {
+  const result = schema.validate(request, {
+    abortEarly: false,
+    allowUnknown: false,
+  })
 
-  return hashedPassword
+  if (result.error) {
+    throw new ResponseError(400, result.error.message)
+  } else {
+    return result.value
+  }
 }

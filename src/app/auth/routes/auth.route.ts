@@ -1,16 +1,14 @@
 import express from "express"
 import "@/app/auth/lib/passport-google"
-import passport from "passport"
+import "@/app/auth/lib/passport-local"
+import authController from "@/app/auth/controllers/auth.controller"
+import authMiddleware from "@/app/auth/middlewares/auth.middleware"
 
 const router = express.Router()
 
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }))
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { scope: ["profile", "email"], failureRedirect: "/auth/google", session: false }),
-  (req, res) => {
-    res.status(200).json(req.user)
-  },
-)
+router.get("/google", authMiddleware.googleAuth())
+router.get("/google/callback", authMiddleware.googleAuthCallback(), authController.googleAuthCallback)
+router.post("/login", authController.loginAuth)
+router.post("/register", authController.registerAuth)
 
 export default router

@@ -4,6 +4,7 @@ import express from "express"
 import { promises as fs } from "fs"
 import path from "path"
 import passport from "passport"
+import errorMiddleware from "@/shared/lib/error-middleware"
 
 import authModule from "@/app/auth/routes/auth.route"
 
@@ -37,6 +38,8 @@ app.get("/", (req, res) => {
 })
 
 app.use("/auth", authModule)
+
+app.use(errorMiddleware)
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)

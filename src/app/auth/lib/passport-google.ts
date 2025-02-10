@@ -1,8 +1,7 @@
 import passport from "passport"
 import { Strategy as GoogleStrategy } from "passport-google-oauth20"
 import db from "@/config/db"
-import { generateHashedPassword } from "@/shared/lib/utils"
-import jwt from "jsonwebtoken"
+import { generateAccessToken, generateHashedPassword } from "@/app/auth/lib/utils"
 
 passport.use(
   new GoogleStrategy(
@@ -36,10 +35,10 @@ passport.use(
 
       const user = await db.user.findUnique({
         where: { email },
+        include: { role: true },
       })
-      const jwtSecret = process.env.JWT_SECRET || ""
 
-      const token = jwt.sign({ id: user?.id, email: user?.email }, jwtSecret, { expiresIn: "1h" })
+      const token = generateAccessToken(user)
 
       await db.user.update({
         where: { email },
