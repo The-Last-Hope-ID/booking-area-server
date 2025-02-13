@@ -5,8 +5,10 @@ import { promises as fs } from "fs"
 import path from "path"
 import passport from "passport"
 import errorMiddleware from "@/shared/lib/error-middleware"
+import fileUpload from "express-fileupload"
 
 import authModule from "@/app/auth/routes/auth.route"
+import courtModule from "@/app/court/routes/court.route"
 
 const app = express()
 const PORT = process.env.APP_PORT || 3000
@@ -33,11 +35,19 @@ app.use(express.json())
 
 app.use(passport.initialize())
 
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: path.join(__dirname, "..", "public", "temp"),
+  }),
+)
+
 app.get("/", (req, res) => {
   res.send("Hello World")
 })
 
 app.use("/auth", authModule)
+app.use("/court", courtModule)
 
 app.use(errorMiddleware)
 
