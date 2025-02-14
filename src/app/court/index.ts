@@ -1,6 +1,6 @@
 import express from "express"
-import courtController from "../controllers/court.controller"
-import courtPriceDayController from "../controllers/court-price-day.controller"
+import courtController from "./controllers/court.controller"
+import courtPriceDayController from "./controllers/court-price-day.controller"
 
 const router = express.Router()
 
