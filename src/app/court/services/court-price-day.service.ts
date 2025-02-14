@@ -1,4 +1,6 @@
 import db from "@/config/db"
+import { validate } from "@/shared/lib/utils"
+import courtPriceDayValidation from "../validations/court-price-day.validation"
 
 const generatePriceDays = async (courtId: number) => {
   const court = await db.court.findUnique({
@@ -26,6 +28,33 @@ const generatePriceDays = async (courtId: number) => {
   return priceDays
 }
 
+const updatePriceDay = async (courtPriceDayId: number, data: { price: number; downPayment: number }) => {
+  const payload = validate(courtPriceDayValidation.updatePriceDaySchema, data)
+
+  const priceDay = await db.courtPriceDay.findUnique({
+    where: {
+      id: courtPriceDayId,
+    },
+  })
+
+  if (!priceDay) {
+    throw new Error("Price day not found")
+  }
+
+  const updatePriceDay = await db.courtPriceDay.update({
+    where: {
+      id: courtPriceDayId,
+    },
+    data: {
+      price: payload.price,
+      downPayment: payload.downPayment,
+    },
+  })
+
+  return updatePriceDay
+}
+
 export default {
   generatePriceDays,
+  updatePriceDay,
 }
