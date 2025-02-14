@@ -7,5 +7,6 @@ const router = express.Router()
 router.post("/", courtController.createCourt)
 router.put("/days/:id", courtPriceDayController.updatePriceDay)
 router.put("/:id", courtController.updateCourt)
+router.delete("/:id", courtController.deleteCourt)
 
 export default router

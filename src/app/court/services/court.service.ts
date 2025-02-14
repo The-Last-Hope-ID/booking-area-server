@@ -63,7 +63,28 @@ const updateCourt = async (
   return data
 }
 
+const deleteCourt = async (id: number) => {
+  const court = await db.court.findUnique({
+    where: {
+      id,
+    },
+  })
+
+  if (!court) {
+    throw new Error("Court not found")
+  }
+
+  const data = await db.court.delete({
+    where: {
+      id,
+    },
+  })
+
+  return data
+}
+
 export default {
   createCourt,
   updateCourt,
+  deleteCourt,
 }

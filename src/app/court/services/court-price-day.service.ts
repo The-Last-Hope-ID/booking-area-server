@@ -54,7 +54,28 @@ const updatePriceDay = async (courtPriceDayId: number, data: { price: number; do
   return updatePriceDay
 }
 
+const deleteAllPriceDays = async (courtId: number) => {
+  const court = await db.court.findUnique({
+    where: {
+      id: courtId,
+    },
+  })
+
+  if (!court) {
+    throw new Error("Court not found")
+  }
+
+  const priceDays = await db.courtPriceDay.deleteMany({
+    where: {
+      courtId,
+    },
+  })
+
+  return priceDays
+}
+
 export default {
   generatePriceDays,
   updatePriceDay,
+  deleteAllPriceDays,
 }

@@ -39,4 +39,21 @@ const updateCourt = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export default { createCourt, updateCourt }
+const deleteCourt = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params
+
+    await courtPriceDayService.deleteAllPriceDays(Number(id))
+    const data = await courtService.deleteCourt(Number(id))
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      data,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+export default { createCourt, updateCourt, deleteCourt }
