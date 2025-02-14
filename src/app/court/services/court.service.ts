@@ -32,6 +32,38 @@ const createCourt = async (court: {
   return data
 }
 
+const updateCourt = async (
+  id: number,
+  court: {
+    name: string
+    description?: string
+    image?: string
+  },
+) => {
+  const payload = validate(courtValidation.updateCourtSchema, court)
+
+  if (payload.image) {
+    const responseStoreImage = await storeImage.uploader.upload(payload.image.tempFilePath, {}, (error, result) => {
+      if (error) {
+        throw new Error(error.message)
+      }
+      return result
+    })
+
+    payload.image = responseStoreImage.url
+  }
+
+  const data = await db.court.update({
+    where: {
+      id,
+    },
+    data: payload,
+  })
+
+  return data
+}
+
 export default {
   createCourt,
+  updateCourt,
 }

@@ -21,4 +21,22 @@ const createCourt = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export default { createCourt }
+const updateCourt = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params
+    const court = await courtService.updateCourt(Number(id), {
+      ...req.body,
+      image: req.files?.image,
+    })
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      data: court,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+export default { createCourt, updateCourt }
