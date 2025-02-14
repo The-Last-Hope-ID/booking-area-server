@@ -22,7 +22,7 @@ app.use(
 )
 
 app.use("/auth", authModule)
-app.use("/court", courtModule)
+app.use("/courts", courtModule)
 
 app.use(errorMiddleware)
 

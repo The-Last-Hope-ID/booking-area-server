@@ -3,6 +3,65 @@ import courtValidation from "../validations/court.validation"
 import db from "@/config/db"
 import storeImage from "@/shared/lib/store-image"
 
+const getCourtsPagination = async (req: {
+  query: {
+    page?: number
+    perPage?: number
+    search?: string
+  }
+}) => {
+  const { page = 1, perPage = 10, search } = req.query
+
+  const data = await db.court.findMany({
+    where: search
+      ? {
+          OR: [
+            {
+              name: {
+                contains: search,
+              },
+            },
+            {
+              description: {
+                contains: search,
+              },
+            },
+          ],
+        }
+      : {},
+    skip: (Number(page) - 1) * Number(perPage),
+    take: Number(perPage),
+  })
+  const totalRecords = await db.court.count({
+    where: search
+      ? {
+          OR: [
+            {
+              name: {
+                contains: search,
+              },
+            },
+            {
+              description: {
+                contains: search,
+              },
+            },
+          ],
+        }
+      : {},
+  })
+  const totalPages = Math.ceil(totalRecords / Number(perPage))
+
+  return {
+    data,
+    meta: {
+      page: Number(page),
+      perPage: Number(perPage),
+      totalPages,
+    },
+  }
+}
+
 const createCourt = async (court: {
   name: string
   description?: string
@@ -84,6 +143,7 @@ const deleteCourt = async (id: number) => {
 }
 
 export default {
+  getCourtsPagination,
   createCourt,
   updateCourt,
   deleteCourt,

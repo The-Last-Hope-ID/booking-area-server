@@ -2,6 +2,20 @@ import { NextFunction, Request, Response } from "express"
 import courtService from "../services/court.service"
 import courtPriceDayService from "../services/court-price-day.service"
 
+const getCourts = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = await courtService.getCourtsPagination(req)
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      ...data,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 const createCourt = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const court = await courtService.createCourt({
@@ -56,4 +70,4 @@ const deleteCourt = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export default { createCourt, updateCourt, deleteCourt }
+export default { getCourts, createCourt, updateCourt, deleteCourt }
