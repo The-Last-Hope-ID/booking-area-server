@@ -1,3 +1,3 @@
-import type { CourtSessionStatus } from "./court-session-status"
+import { CourtSessionStatus } from "./court-session-status"
 
-export type { CourtSessionStatus }
+export { CourtSessionStatus }
