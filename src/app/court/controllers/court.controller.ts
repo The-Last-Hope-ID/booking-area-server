@@ -37,8 +37,8 @@ const createCourt = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateCourt = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params
-    const court = await courtService.updateCourt(Number(id), {
+    const { courtId } = req.params
+    const court = await courtService.updateCourt(Number(courtId), {
       ...req.body,
       image: req.files?.image,
     })
@@ -55,10 +55,10 @@ const updateCourt = async (req: Request, res: Response, next: NextFunction) => {
 
 const deleteCourt = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params
+    const { courtId } = req.params
 
-    await courtPriceDayService.deleteAllPriceDays(Number(id))
-    const data = await courtService.deleteCourt(Number(id))
+    await courtPriceDayService.deleteAllPriceDays(Number(courtId))
+    const data = await courtService.deleteCourt(Number(courtId))
 
     res.status(200).json({
       message: "OK",

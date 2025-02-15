@@ -64,8 +64,8 @@ model Court {
 model CourtSession {
   id Int @id @default(autoincrement())
   courtId Int  @map("court_id")
-  startHour Int @map("start_hour")
-  endHour Int @map("end_hour")
+  startHour DateTime @db.Time() @map("start_hour")
+  endHour DateTime @db.Time() @map("end_hour")
   status CourtSessionStatus @default(AVAILABLE)
   createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
   updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
