@@ -80,7 +80,7 @@ model CourtSession {
 model CourtSessionUnavailable {
   id Int @id @default(autoincrement())
   courtSessionId Int @map("court_session_id")
-  date DateTime @db.DateTime(0)
+  date DateTime @db.Date
   createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
   updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
