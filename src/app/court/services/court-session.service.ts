@@ -57,7 +57,32 @@ const updateSession = async (
 ) => {
   const payload = validate(courtSessionValidation.updateCourtSessionSchema, data)
 
-  const courtSession = await db.courtSession.update({
+  const courtSession = await db.courtSession.findUnique({
+    where: {
+      id: sessionId,
+    },
+  })
+
+  if (!courtSession) {
+    throw new Error("Court session not found")
+  }
+
+  const sessionAlreadyExists = await db.courtSession.findFirst({
+    where: {
+      NOT: {
+        id: sessionId,
+      },
+      courtId: courtSession.courtId,
+      startHour: new Date(payload.startHour).toISOString(),
+      endHour: new Date(payload.endHour).toISOString(),
+    },
+  })
+
+  if (sessionAlreadyExists) {
+    throw new ResponseError(400, "Court session already exists")
+  }
+
+  const updateCourtSession = await db.courtSession.update({
     where: {
       id: sessionId,
     },
@@ -68,7 +93,7 @@ const updateSession = async (
     },
   })
 
-  return courtSession
+  return updateCourtSession
 }
 
 const deleteSession = async (sessionId: number) => {

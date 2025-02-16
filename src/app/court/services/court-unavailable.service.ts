@@ -1,6 +1,10 @@
 import db from "@/config/db"
+import courtUnavailableValidation from "../validations/court-unavailable.validation"
+import { ResponseError, validate } from "@/shared/lib/utils"
 
 const createUnvailableSessionCourt = async (courtId: number, date: string) => {
+  const payload = validate(courtUnavailableValidation.courtUnavailableSchema, { date })
+
   const courtSession = await db.court.findUnique({
     where: {
       id: courtId,
@@ -15,7 +19,7 @@ const createUnvailableSessionCourt = async (courtId: number, date: string) => {
     where: {
       courtId,
       date: {
-        equals: new Date(date.split("T")[0]),
+        equals: new Date(payload.date.split("T")[0]),
       },
     },
   })
@@ -35,6 +39,8 @@ const createUnvailableSessionCourt = async (courtId: number, date: string) => {
 }
 
 const updateUnvailableSessionCourt = async (unaviableId: number, date: string) => {
+  const payload = validate(courtUnavailableValidation.courtUnavailableSchema, { date })
+
   const courtSessionUnavailable = await db.courtUnavailable.findUnique({
     where: {
       id: unaviableId,
@@ -52,13 +58,13 @@ const updateUnvailableSessionCourt = async (unaviableId: number, date: string) =
       },
       courtId: courtSessionUnavailable.courtId,
       date: {
-        equals: new Date(date.split("T")[0]),
+        equals: new Date(payload.date.split("T")[0]),
       },
     },
   })
 
   if (courtSessionUnavailableAlreadyExists) {
-    throw new Error("Court session unavailable already exists")
+    throw new ResponseError(400, "Court session unavailable already exists")
   }
 
   const updatedCourtSessionUnavailable = await db.courtUnavailable.update({
