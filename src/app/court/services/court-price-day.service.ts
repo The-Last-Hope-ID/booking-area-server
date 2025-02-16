@@ -2,6 +2,16 @@ import db from "@/config/db"
 import { validate } from "@/shared/lib/utils"
 import courtPriceDayValidation from "../validations/court-price-day.validation"
 
+const getPriceDays = async (courtId: number) => {
+  const priceDays = await db.courtPriceDay.findMany({
+    where: {
+      courtId,
+    },
+  })
+
+  return priceDays
+}
+
 const generatePriceDays = async (courtId: number) => {
   const court = await db.court.findUnique({
     where: {
@@ -75,6 +85,7 @@ const deleteAllPriceDays = async (courtId: number) => {
 }
 
 export default {
+  getPriceDays,
   generatePriceDays,
   updatePriceDay,
   deleteAllPriceDays,
