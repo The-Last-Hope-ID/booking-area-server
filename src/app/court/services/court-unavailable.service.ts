@@ -1,9 +1,9 @@
 import db from "@/config/db"
 
-const createUnvailableSessionCourt = async (courtSessionId: number, date: string) => {
-  const courtSession = await db.courtSession.findUnique({
+const createUnvailableSessionCourt = async (courtId: number, date: string) => {
+  const courtSession = await db.court.findUnique({
     where: {
-      id: courtSessionId,
+      id: courtId,
     },
   })
 
@@ -11,10 +11,12 @@ const createUnvailableSessionCourt = async (courtSessionId: number, date: string
     throw new Error("Court session not found")
   }
 
-  const courtSessionUnavailableAlreadyExists = await db.courtSessionUnavailable.findFirst({
+  const courtSessionUnavailableAlreadyExists = await db.courtUnavailable.findFirst({
     where: {
-      courtSessionId,
-      date,
+      courtId,
+      date: {
+        equals: new Date(date.split("T")[0]),
+      },
     },
   })
 
@@ -22,9 +24,9 @@ const createUnvailableSessionCourt = async (courtSessionId: number, date: string
     throw new Error("Court session unavailable already exists")
   }
 
-  const courtSessionUnavailable = await db.courtSessionUnavailable.create({
+  const courtSessionUnavailable = await db.courtUnavailable.create({
     data: {
-      courtSessionId,
+      courtId,
       date,
     },
   })
@@ -32,6 +34,67 @@ const createUnvailableSessionCourt = async (courtSessionId: number, date: string
   return courtSessionUnavailable
 }
 
+const updateUnvailableSessionCourt = async (unaviableId: number, date: string) => {
+  const courtSessionUnavailable = await db.courtUnavailable.findUnique({
+    where: {
+      id: unaviableId,
+    },
+  })
+
+  if (!courtSessionUnavailable) {
+    throw new Error("Court session unavailable not found")
+  }
+
+  const courtSessionUnavailableAlreadyExists = await db.courtUnavailable.findFirst({
+    where: {
+      NOT: {
+        id: unaviableId,
+      },
+      courtId: courtSessionUnavailable.courtId,
+      date: {
+        equals: new Date(date.split("T")[0]),
+      },
+    },
+  })
+
+  if (courtSessionUnavailableAlreadyExists) {
+    throw new Error("Court session unavailable already exists")
+  }
+
+  const updatedCourtSessionUnavailable = await db.courtUnavailable.update({
+    where: {
+      id: unaviableId,
+    },
+    data: {
+      date,
+    },
+  })
+
+  return updatedCourtSessionUnavailable
+}
+
+const deleteUnvailableSessionCourt = async (unaviableId: number) => {
+  const courtSessionUnavailable = await db.courtUnavailable.findUnique({
+    where: {
+      id: unaviableId,
+    },
+  })
+
+  if (!courtSessionUnavailable) {
+    throw new Error("Court session unavailable not found")
+  }
+
+  const sessionUnavailable = await db.courtUnavailable.delete({
+    where: {
+      id: unaviableId,
+    },
+  })
+
+  return sessionUnavailable
+}
+
 export default {
   createUnvailableSessionCourt,
+  updateUnvailableSessionCourt,
+  deleteUnvailableSessionCourt,
 }

@@ -57,6 +57,7 @@ model Court {
 
   sessions CourtSession[]
   prices CourtPriceDay[]
+  unavailables CourtUnavailable[]
 
   @@map("courts")
 }
@@ -71,22 +72,21 @@ model CourtSession {
   updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
   court Court @relation(fields: [courtId], references: [id])
-  unavailables CourtSessionUnavailable[]
   bookings Booking[]
 
   @@map("court_sessions")
 }
 
-model CourtSessionUnavailable {
+model CourtUnavailable {
   id Int @id @default(autoincrement())
-  courtSessionId Int @map("court_session_id")
+  courtId Int @map("court_id")
   date DateTime @db.Date
   createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
   updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
-  session CourtSession @relation(fields: [courtSessionId], references: [id])
+  court Court @relation(fields: [courtId], references: [id])
 
-  @@map("court_sessions_unavailable")
+  @@map("court_unavailables")
 }
 
 model CourtPriceDay {

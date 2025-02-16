@@ -2,7 +2,7 @@ import express from "express"
 import courtController from "./controllers/court.controller"
 import courtPriceDayController from "./controllers/court-price-day.controller"
 import courtSessionController from "./controllers/court-session.controller"
-import courtUnavailableSessionController from "./controllers/court-unavailable-session.controller"
+import courtUnavailableSessionController from "./controllers/court-unavailable.controller"
 
 const router = express.Router()
 
@@ -12,7 +12,9 @@ router.put("/:courtId/days/:dayId", courtPriceDayController.updatePriceDay)
 router.post("/:courtId/sessions", courtSessionController.createSession)
 // router.put("/:courtId/sessions/:sessionId", courtSessionController.updateSession)
 router.delete("/:courtId/sessions/:sessionId", courtSessionController.deleteSession)
-router.post("/:courtId/sessions/:sessionId/unavailable", courtUnavailableSessionController.createUnvailableCourt)
+router.post("/:courtId/unavailables", courtUnavailableSessionController.createUnvailableCourt)
+router.put("/:courtId/unavailables/:unavailableId", courtUnavailableSessionController.updateUnvailableCourt)
+router.delete("/:courtId/unavailables/:unavailableId", courtUnavailableSessionController.deleteUnvailableCourt)
 router.put("/:courtId", courtController.updateCourt)
 router.delete("/:courtId", courtController.deleteCourt)
 
