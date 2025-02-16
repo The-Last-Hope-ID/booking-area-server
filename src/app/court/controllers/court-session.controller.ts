@@ -1,6 +1,21 @@
 import { NextFunction, Request, Response } from "express"
 import courtSessionService from "../services/court-session.service"
 
+const getSession = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courtId } = req.params
+    const data = await courtSessionService.getSessionPagination(Number(courtId), req.query)
+
+    res.status(200).json({
+      status: 200,
+      message: "OK",
+      data,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 const createSession = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { courtId } = req.params
@@ -47,6 +62,7 @@ const deleteSession = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export default {
+  getSession,
   createSession,
   updateSession,
   deleteSession,

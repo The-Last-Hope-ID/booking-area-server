@@ -3,6 +3,39 @@ import courtSessionValidation from "../validations/court-session.validation"
 import { CourtSessionStatus } from "@/shared/enums"
 import db from "@/config/db"
 
+const getSessionPagination = async (
+  courtId: number,
+  req: {
+    page?: number
+    perPage?: number
+  },
+) => {
+  const { page = 1, perPage = 10 } = req
+
+  const courtSessions = await db.courtSession.findMany({
+    where: {
+      courtId,
+    },
+    skip: (Number(page) - 1) * Number(perPage),
+    take: Number(perPage),
+  })
+  const totalRecords = await db.courtSession.count({
+    where: {
+      courtId: courtId,
+    },
+  })
+  const totalPages = Math.ceil(totalRecords / Number(perPage))
+
+  return {
+    data: courtSessions,
+    meta: {
+      page: Number(page),
+      perPage: Number(perPage),
+      totalPages,
+    },
+  }
+}
+
 const createSession = async (
   courtId: number,
   data: {
@@ -107,6 +140,7 @@ const deleteSession = async (sessionId: number) => {
 }
 
 export default {
+  getSessionPagination,
   createSession,
   updateSession,
   deleteSession,
