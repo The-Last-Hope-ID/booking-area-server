@@ -29,6 +29,11 @@ const getCourtsPagination = async (req: {
           ],
         }
       : {},
+    include: {
+      unavailables: true,
+      prices: true,
+      sessions: true,
+    },
     skip: (Number(page) - 1) * Number(perPage),
     take: Number(perPage),
   })

@@ -2,6 +2,49 @@ import db from "@/config/db"
 import courtUnavailableValidation from "../validations/court-unavailable.validation"
 import { ResponseError, validate } from "@/shared/lib/utils"
 
+const getCourtUnavailablesPagination = async (
+  courtId: number,
+  req: {
+    page?: number
+    perPage?: number
+    startDate?: string
+    endDate?: string
+  },
+) => {
+  const { page = 1, perPage = 10, startDate, endDate } = req
+
+  const whereClause = {
+    courtId,
+    ...(startDate &&
+      endDate && {
+        date: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+      }),
+  }
+
+  const data = await db.courtUnavailable.findMany({
+    where: whereClause,
+    skip: (Number(page) - 1) * Number(perPage),
+    take: Number(perPage),
+  })
+
+  const totalRecords = await db.courtUnavailable.count({
+    where: whereClause,
+  })
+  const totalPages = Math.ceil(totalRecords / Number(perPage))
+
+  return {
+    data,
+    meta: {
+      page: Number(page),
+      perPage: Number(perPage),
+      totalPages,
+    },
+  }
+}
+
 const createUnvailableSessionCourt = async (courtId: number, date: string) => {
   const payload = validate(courtUnavailableValidation.courtUnavailableSchema, { date })
 
@@ -100,6 +143,7 @@ const deleteUnvailableSessionCourt = async (unaviableId: number) => {
 }
 
 export default {
+  getCourtUnavailablesPagination,
   createUnvailableSessionCourt,
   updateUnvailableSessionCourt,
   deleteUnvailableSessionCourt,

@@ -1,6 +1,20 @@
 import { NextFunction, Request, Response } from "express"
 import courtUnavailableService from "../services/court-unavailable.service"
 
+const getUnavailables = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = await courtUnavailableService.getCourtUnavailablesPagination(Number(req.params.courtId), req.query)
+
+    res.status(200).json({
+      status: 200,
+      message: "OK",
+      ...data,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 const createUnvailableCourt = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await courtUnavailableService.createUnvailableSessionCourt(Number(req.params.courtId), req.body.date)
@@ -44,6 +58,7 @@ const deleteUnvailableCourt = async (req: Request, res: Response, next: NextFunc
 }
 
 export default {
+  getUnavailables,
   createUnvailableCourt,
   updateUnvailableCourt,
   deleteUnvailableCourt,
