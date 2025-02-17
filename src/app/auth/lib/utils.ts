@@ -13,5 +13,5 @@ export const generateHashedPassword = (password: string) => {
 export const generateAccessToken = (user: User | null) => {
   const jwtSecret = process.env.JWT_SECRET || ""
 
-  return jwt.sign({ id: user?.id, email: user?.email }, jwtSecret, { expiresIn: "1h" })
+  return jwt.sign({ id: user?.id, email: user?.email, isAdmin: user?.isAdmin, role: user?.role }, jwtSecret, { expiresIn: "1h" })
 }

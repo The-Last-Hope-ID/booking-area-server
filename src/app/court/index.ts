@@ -3,8 +3,11 @@ import courtController from "./controllers/court.controller"
 import courtPriceDayController from "./controllers/court-price-day.controller"
 import courtSessionController from "./controllers/court-session.controller"
 import courtUnavailableSessionController from "./controllers/court-unavailable.controller"
+import { authMiddleware } from "@/shared/lib/auth-middleware"
 
 const router = express.Router()
+
+router.use(authMiddleware)
 
 router.get("/", courtController.getCourts)
 router.post("/", courtController.createCourt)
