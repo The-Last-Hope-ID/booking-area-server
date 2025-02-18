@@ -67,6 +67,20 @@ const getCourtsPagination = async (req: {
   }
 }
 
+const getCourtById = async (id: number) => {
+  const data = await db.court.findUnique({
+    where: {
+      id,
+    },
+  })
+
+  if (!data) {
+    throw new Error("Court not found")
+  }
+
+  return data
+}
+
 const createCourt = async (court: {
   name: string
   description?: string
@@ -149,6 +163,7 @@ const deleteCourt = async (id: number) => {
 
 export default {
   getCourtsPagination,
+  getCourtById,
   createCourt,
   updateCourt,
   deleteCourt,

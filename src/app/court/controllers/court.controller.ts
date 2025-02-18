@@ -16,6 +16,21 @@ const getCourts = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+const getCourt = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courtId } = req.params
+    const data = await courtService.getCourtById(Number(courtId))
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      data,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 const createCourt = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const court = await courtService.createCourt({
@@ -70,4 +85,4 @@ const deleteCourt = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export default { getCourts, createCourt, updateCourt, deleteCourt }
+export default { getCourts, getCourt, createCourt, updateCourt, deleteCourt }
