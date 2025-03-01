@@ -105,11 +105,12 @@ model CourtPriceDay {
 
 model Booking {
   id Int @id @default(autoincrement())
+  invoiceNumber String @unique @map("invoice_number")
   userId Int @map("user_id")
-  adminId Int @map("admin_id")
+  adminId Int? @map("admin_id")
   courtSessionId Int @map("court_session_id")
   bookingDate DateTime @db.DateTime(0) @map("booking_date")
-  paymentId String @map("payment_id")
+  paymentCompleted Boolean @default(false) @map("payment_completed")
   paymentType String @map("payment_type") 
   status BookingStatus @default(PENDING)
   downPayment Decimal @db.Decimal(10, 0) @default(0) @map("down_payment")
@@ -118,7 +119,7 @@ model Booking {
   updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
 
   user User @relation(name: "UserBookings", fields: [userId], references: [id])
-  admin User @relation(name: "AdminBookings", fields: [adminId], references: [id]) 
+  admin User? @relation(name: "AdminBookings", fields: [adminId], references: [id]) 
   session CourtSession @relation(fields: [courtSessionId], references: [id])
 
   @@map("bookings")

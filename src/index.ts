@@ -8,6 +8,7 @@ import fileUpload from "express-fileupload"
 
 import authModule from "@/app/auth"
 import courtModule from "@/app/court"
+import bookingModule from "@/app/booking"
 
 const app = express()
 const PORT = process.env.APP_PORT || 3000
@@ -23,6 +24,7 @@ app.use(
 
 app.use("/auth", authModule)
 app.use("/courts", courtModule)
+app.use("/bookings", bookingModule)
 
 app.use(errorMiddleware)
 
