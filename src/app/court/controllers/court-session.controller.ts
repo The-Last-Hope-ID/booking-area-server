@@ -9,7 +9,7 @@ const getSession = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
       status: 200,
       message: "OK",
-      data,
+      ...data,
     })
   } catch (e) {
     next(e)

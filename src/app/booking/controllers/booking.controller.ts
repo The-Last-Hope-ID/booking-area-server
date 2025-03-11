@@ -5,7 +5,6 @@ import { User } from "@/shared/types"
 const createBooking = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user as User
-    console.log({ date: new Date().toISOString() })
     const booking = await bookingService.createBooking({
       userId: user.id,
       invoiceNumber: req.body.invoiceNumber,
@@ -15,7 +14,7 @@ const createBooking = async (req: Request, res: Response, next: NextFunction) =>
       downPayment: req.body.downPayment,
     })
 
-    res.json({
+    res.status(201).json({
       message: "Created",
       status: 201,
       data: booking,
@@ -29,7 +28,7 @@ const completePayment = async (req: Request, res: Response, next: NextFunction) 
   try {
     const booking = await bookingService.completePayment(Number(req.params.id))
 
-    res.json({
+    res.status(200).json({
       message: "OK",
       status: 200,
       data: booking,
@@ -48,7 +47,7 @@ const settleBooking = async (req: Request, res: Response, next: NextFunction) =>
       price: req.body.price,
     })
 
-    res.json({
+    res.status(200).json({
       message: "OK",
       status: 200,
       data: booking,
