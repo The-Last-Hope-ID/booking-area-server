@@ -2,6 +2,44 @@ import db from "@/config/db"
 import { validate } from "@/shared/lib/utils"
 import bookingValidation from "../validations/booking.validation"
 
+const getBookingsPagination = async (req: {
+  query: {
+    page?: number
+    perPage?: number
+    search?: string
+    to?: string
+    from?: string
+  }
+}) => {
+  const { page = 1, perPage = 10, to = new Date(), from = new Date() } = req.query
+
+  const data = await db.booking.findMany({
+    where: {
+      AND: [
+        {
+          bookingDate: {
+            gte: to,
+          },
+        },
+        {
+          bookingDate: {
+            lte: from,
+          },
+        },
+      ],
+    },
+    include: {
+      user: true,
+      admin: true,
+      session: true,
+    },
+    skip: (Number(page) - 1) * Number(perPage),
+    take: Number(perPage),
+  })
+
+  return data
+}
+
 const createBooking = async (data: {
   userId: number
   invoiceNumber: string
@@ -89,8 +127,33 @@ const settleBooking = async (data: { adminId: number; bookingId: number; price: 
   return booking
 }
 
+const deleteBooking = async (bookingId: number) => {
+  const isBookingExist = await db.booking.findUnique({
+    where: {
+      id: bookingId,
+    },
+  })
+
+  if (!isBookingExist) {
+    throw new Error("Court not found")
+  }
+
+  const booking = await db.booking.update({
+    where: {
+      id: bookingId,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  })
+
+  return booking
+}
+
 export default {
   createBooking,
   settleBooking,
   completePayment,
+  deleteBooking,
+  getBookingsPagination,
 }

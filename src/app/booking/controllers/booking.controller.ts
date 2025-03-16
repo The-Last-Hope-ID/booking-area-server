@@ -2,6 +2,20 @@ import { NextFunction, Request, Response } from "express"
 import bookingService from "../services/booking.service"
 import { User } from "@/shared/types"
 
+const getBookings = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = await bookingService.getBookingsPagination(req)
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      ...data,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 const createBooking = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user as User
@@ -57,8 +71,24 @@ const settleBooking = async (req: Request, res: Response, next: NextFunction) =>
   }
 }
 
+const deleteBooking = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const booking = bookingService.deleteBooking(Number(req.params.id))
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      data: booking,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 export default {
   createBooking,
   settleBooking,
   completePayment,
+  deleteBooking,
+  getBookings,
 }

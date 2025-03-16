@@ -117,6 +117,7 @@ model Booking {
   totalPrice Decimal @db.Decimal(10, 0) @default(0) @map("total_price")
   createdAt DateTime @db.DateTime(0) @default(now()) @map("created_at")
   updatedAt DateTime @db.DateTime(0) @updatedAt @map("updated_at")
+  deletedAt DateTime? @db.DateTime(0) @map("deleted_at")
 
   user User @relation(name: "UserBookings", fields: [userId], references: [id])
   admin User? @relation(name: "AdminBookings", fields: [adminId], references: [id]) 
