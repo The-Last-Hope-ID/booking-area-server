@@ -5,7 +5,6 @@ import { User } from "@/shared/types"
 const createBooking = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user as User
-    console.log({ date: new Date().toISOString() })
     const booking = await bookingService.createBooking({
       userId: user.id,
       invoiceNumber: req.body.invoiceNumber,
