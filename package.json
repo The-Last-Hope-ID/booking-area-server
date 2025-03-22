@@ -46,6 +46,6 @@
     "passport-local": "^1.0.0"
   },
   "_moduleAliases": {
-    "@": "dist"
+    "@": "src"
   }
 }

@@ -18,15 +18,16 @@ const getBookingsPagination = async (req: {
       AND: [
         {
           bookingDate: {
-            gte: to,
+            lte: to,
           },
         },
         {
           bookingDate: {
-            lte: from,
+            gte: from,
           },
         },
       ],
+      deletedAt: null,
     },
     include: {
       user: true,
@@ -36,8 +37,33 @@ const getBookingsPagination = async (req: {
     skip: (Number(page) - 1) * Number(perPage),
     take: Number(perPage),
   })
+  const totalRecords = await db.booking.count({
+    where: {
+      AND: [
+        {
+          bookingDate: {
+            lte: to,
+          },
+        },
+        {
+          bookingDate: {
+            gte: from,
+          },
+        },
+      ],
+      deletedAt: null,
+    },
+  })
+  const totalPages = Math.ceil(totalRecords / Number(perPage))
 
-  return data
+  return {
+    data,
+    meta: {
+      page: Number(page),
+      perPage: Number(perPage),
+      totalPages,
+    },
+  }
 }
 
 const createBooking = async (data: {
@@ -135,7 +161,7 @@ const deleteBooking = async (bookingId: number) => {
   })
 
   if (!isBookingExist) {
-    throw new Error("Court not found")
+    throw new Error("Booking not found")
   }
 
   const booking = await db.booking.update({
