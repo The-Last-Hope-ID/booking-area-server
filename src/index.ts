@@ -11,6 +11,7 @@ import courtModule from "@/app/court"
 import bookingModule from "@/app/booking"
 import settingModule from "@/app/setting"
 import userModule from "@/app/user"
+import roleModule from "@/app/role"
 
 const app = express()
 const PORT = process.env.APP_PORT || 3000
@@ -29,6 +30,7 @@ app.use("/courts", courtModule)
 app.use("/bookings", bookingModule)
 app.use("/setting", settingModule)
 app.use("/users", userModule)
+app.use("/roles", roleModule)
 
 app.use(errorMiddleware)
 

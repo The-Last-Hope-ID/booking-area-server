@@ -9,10 +9,10 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
     if (accessToken) {
       jwt.verify(accessToken, process.env.JWT_SECRET || "", (err: any, user: any) => {
         if (err) {
-          res.status(403).json({ message: "Unauthorized" })
+          return res.status(403).json({ message: "Unauthorized" })
         }
         req.user = user
-        next()
+        return next()
       })
     } else {
       res.status(403).json({ message: "Unauthorized" })
