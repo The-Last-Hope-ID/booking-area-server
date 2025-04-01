@@ -5,6 +5,7 @@ import path from "path"
 import passport from "passport"
 import errorMiddleware from "@/shared/lib/error-middleware"
 import fileUpload from "express-fileupload"
+import cors from "cors"
 
 import authModule from "@/app/auth"
 import courtModule from "@/app/court"
@@ -16,6 +17,7 @@ import roleModule from "@/app/role"
 const app = express()
 const PORT = process.env.APP_PORT || 3000
 
+app.use(cors())
 app.use(express.json())
 app.use(passport.initialize())
 app.use(
