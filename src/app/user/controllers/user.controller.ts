@@ -8,11 +8,12 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
       username: req.body.username,
       email: req.body.email,
       password: req.body.password,
-      profileImg: req.body.profileImg,
+      profileImg: req.files?.profileImg,
+      phone: req.body.phone,
     })
 
-    res.json({
-      message: "created",
+    res.status(201).json({
+      message: "Created",
       status: 201,
       data: data,
     })
@@ -23,11 +24,12 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await userService.getUsers()
+    const users = await userService.getUsersPagination(req)
+
     res.json({
-      message: "ok",
+      message: "OK",
       status: 200,
-      data: users,
+      ...users,
     })
   } catch (e) {
     next(e)
@@ -47,7 +49,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     })
 
     res.status(200).json({
-      message: "ok",
+      message: "OK",
       status: 200,
       data: user,
     })
