@@ -93,6 +93,24 @@ const getUsers = async () => {
   return users
 }
 
+const getUser = async (userId: number) => {
+  const user = await db.user.findFirst({
+    where: {
+      deletedAt: null,
+      id: userId,
+    },
+    include: {
+      bookingsAdmin: true,
+    },
+  })
+
+  if (!user) {
+    throw new ResponseError(404, "User not found")
+  }
+
+  return user
+}
+
 const getUsersPagination = async (req: {
   query: {
     page?: number
@@ -308,6 +326,7 @@ const deleteUser = async (userId: number) => {
 export default {
   createUser,
   getUsers,
+  getUser,
   getUsersPagination,
   updateUser,
   deleteUser,

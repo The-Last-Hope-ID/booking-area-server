@@ -36,6 +36,20 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+const getUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await userService.getUser(Number(req.params.id))
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      data: user,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req?.params?.id)
@@ -76,6 +90,7 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 export default {
   createUser,
   getUsers,
+  getUser,
   updateUser,
   deleteUser,
 }

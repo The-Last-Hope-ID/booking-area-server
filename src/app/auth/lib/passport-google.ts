@@ -14,8 +14,8 @@ passport.use(
     async (req, accessToken, refreshToken, profile, done) => {
       if (!profile.emails || profile.emails.length === 0) return
       const email = profile.emails[0].value
-      const isUserExist = await db.user.findUnique({
-        where: { email },
+      const isUserExist = await db.user.findFirst({
+        where: { email, deletedAt: null },
       })
 
       if (!isUserExist) {
@@ -33,7 +33,7 @@ passport.use(
         })
       }
 
-      const user = await db.user.findUnique({
+      const user = await db.user.findFirst({
         where: { email },
         include: { role: true },
       })
@@ -41,7 +41,9 @@ passport.use(
       const token = generateAccessToken(user)
 
       await db.user.update({
-        where: { email },
+        where: {
+          id: user?.id,
+        },
         data: {
           accessToken: token,
         },

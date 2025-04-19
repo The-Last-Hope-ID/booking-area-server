@@ -42,8 +42,8 @@ passport.use(
       passwordField: "password",
     },
     async (username, password, done) => {
-      const user = await db.user.findUnique({
-        where: { email: username },
+      const user = await db.user.findFirst({
+        where: { email: username, deletedAt: null },
         include: { role: true },
       })
 

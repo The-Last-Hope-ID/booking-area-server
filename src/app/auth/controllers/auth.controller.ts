@@ -55,7 +55,7 @@ const loginAuth = async (req: Request, res: Response, next: NextFunction) => {
 const registerAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const body = validate(authValidation.registerSchema, req.body)
-    const isUsernameAlreadyExist = await db.user.findUnique({
+    const isUsernameAlreadyExist = await db.user.findFirst({
       where: { username: body.username },
     })
 
@@ -63,7 +63,7 @@ const registerAuth = async (req: Request, res: Response, next: NextFunction) => 
       throw new ResponseError(400, "Username already exist")
     }
 
-    const isEmailAlreadyExist = await db.user.findUnique({
+    const isEmailAlreadyExist = await db.user.findFirst({
       where: { email: body.email },
     })
 
@@ -71,7 +71,7 @@ const registerAuth = async (req: Request, res: Response, next: NextFunction) => 
       throw new ResponseError(400, "Email already exist")
     }
 
-    const isPhoneAlreadyExist = await db.user.findUnique({
+    const isPhoneAlreadyExist = await db.user.findFirst({
       where: { phone: body.phone },
     })
 
