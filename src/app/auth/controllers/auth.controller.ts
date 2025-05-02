@@ -95,4 +95,64 @@ const registerAuth = async (req: Request, res: Response, next: NextFunction) => 
   }
 }
 
-export default { googleAuthCallback, loginAuth, registerAuth }
+const userAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user as User
+
+    if (!user) {
+      throw new ResponseError(401, "Unauthorized")
+    }
+
+    const data = await db.user.findFirst({
+      where: { id: user?.id },
+      include: {
+        role: {
+          include: {
+            permissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
+    })
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      data,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+const logout = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = (req?.user as User & { id: number })?.id
+
+    if (!userId) {
+      throw new ResponseError(400, "Invalid user ID")
+    }
+
+    await db.user.update({
+      where: { id: userId },
+      data: { accessToken: null },
+    })
+
+    const user = req.user
+
+    req.user = undefined
+
+    res.status(200).json({
+      message: "OK",
+      status: 200,
+      data: user,
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+export default { googleAuthCallback, loginAuth, registerAuth, userAuth, logout }

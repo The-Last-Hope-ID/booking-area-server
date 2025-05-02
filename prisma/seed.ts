@@ -28,6 +28,7 @@ async function main() {
       { name: "create court unavailables" },
       { name: "update court unavailables" },
       { name: "delete court unavailables" },
+      { name: "view dashboard" },
     ],
   })
 
@@ -60,6 +61,7 @@ async function main() {
             { permissionId: 21 },
             { permissionId: 22 },
             { permissionId: 23 },
+            { permissionId: 24 },
           ],
         },
       },

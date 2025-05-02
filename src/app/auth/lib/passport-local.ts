@@ -44,7 +44,13 @@ passport.use(
     async (username, password, done) => {
       const user = await db.user.findFirst({
         where: { email: username, deletedAt: null },
-        include: { role: true },
+        include: {
+          role: {
+            include: {
+              permissions: true,
+            },
+          },
+        },
       })
 
       if (!user) {

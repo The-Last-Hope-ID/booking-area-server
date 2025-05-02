@@ -8,7 +8,7 @@ export class ResponseError extends Error {
 
 export const validate = (schema: any, request: any) => {
   const result = schema.validate(request, {
-    abortEarly: false,
+    abortEarly: true,
     allowUnknown: false,
   })
 
